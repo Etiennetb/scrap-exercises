@@ -3,29 +3,26 @@ require "nokogiri"
 require "open-uri"
 require "pry"
    
-#get_the_email_of_a_townhal_from_its_webpage
- def get_webpage_content
- 	page = Nokogiri::HTML(open("http://annuaire-des-mairies.com/95/ableiges.html"))
-		puts page.class
 
-	content_array = page.css("td[class=style27]").text.split
-    email_array = []
+def get_the_email_of_a_townhal_from_its_webpage
+	landing_page = Nokogiri::HTML(open("http://annuaire-des-mairies.com/val-d-oise.html"))
     
-    content_array.each do |adress|
-    	email_array << adress if adress.include?("@")
- end
- puts email_array
+    city_array = []
+    city_links = landing_page.css("a[class=lientxt]")
+    city_links.each do |link|   
+    city_array << link['href'].sub!(".", "http://annuaire-des-mairies.com")
 end
+    	#puts city_array
+	townhall_email_array = []
+	city_array.each do |url|
+	page = Nokogiri::HTML(open("#{url}"))
 
-def get_all_links
-	page = Nokogiri::HTML(open("http://annuaire-des-mairies.com/val-d-oise.html"))
-    
-    city_links = page.css("a[class=lientxt]")
-    city_links.each{|link| puts link['href'].sub!(".", "http://annuaire-des-mairies.com")}
-   
-   
-
+		content_array = page.css("td[class=style27]").text.split
+	    content_array.each do |adress|
+	    	townhall_email_array << adress if adress.include?("@")
+	 end
 end
-
-get_webpage_content
-get_all_links
+	puts townhall_email_array
+	puts townhall_email_array.size
+end
+get_the_email_of_a_townhal_from_its_webpage
